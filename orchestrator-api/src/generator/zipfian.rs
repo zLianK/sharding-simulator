@@ -1,5 +1,8 @@
-use crate::generator::strategy::DistributionStrategy;
-use anyhow::Result;
+use crate::{
+    error::{AppError, AppResult},
+    generator::strategy::DistributionStrategy,
+};
+use error_stack::ResultExt;
 use rand::{RngExt, rngs::StdRng};
 use rand_distr::Zipf;
 
@@ -10,9 +13,11 @@ pub struct ZipfianStrategy {
 }
 
 impl ZipfianStrategy {
-    pub fn new(n: u64, s: f64) -> Result<Self> {
+    pub fn new(n: u64, s: f64) -> AppResult<Self> {
         Ok(Self {
-            zipf: Zipf::new(n as f64, s)?,
+            zipf: Zipf::new(n as f64, s).change_context(AppError::SeedDistributionError(
+                "failed to create zipfian strategy".to_string(),
+            ))?,
         })
     }
 }
