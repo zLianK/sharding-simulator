@@ -1,9 +1,17 @@
-use crate::log::log_install;
-use axum::{Router, routing::get};
+use crate::{
+    log::log_install,
+    service::seed::{uniform_seed, zipfian_seed},
+};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 use tokio::net::TcpListener;
 use tracing::info;
 
 mod log;
+mod model;
+mod service;
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +20,8 @@ async fn main() {
     let listener = get_listener().await;
 
     let app = Router::new()
-        .route("/seed", get(seed))
+        .route("/seed/uniform", post(uniform_seed))
+        .route("/seed/zipfian", post(zipfian_seed))
         .route("/shard", get(shard))
         .route("/reshard", get(reshard));
 
@@ -25,11 +34,6 @@ async fn get_listener() -> TcpListener {
     let addr = listener.local_addr().unwrap();
     info!("listening on {addr}");
     listener
-}
-
-/// Starts the seeding process.
-async fn seed() -> String {
-    "The seeding process has started successfully.".to_string()
 }
 
 /// Starts the sharding process.
