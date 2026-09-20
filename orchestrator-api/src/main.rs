@@ -7,6 +7,7 @@ use tracing::info;
 
 mod controller;
 mod error;
+mod generator;
 mod log;
 mod model;
 mod routes;

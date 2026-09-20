@@ -1,4 +1,4 @@
-use crate::DistributionStrategy;
+use crate::generator::strategy::DistributionStrategy;
 use anyhow::Result;
 use rand::{RngExt, rngs::StdRng};
 use rand_distr::Uniform;

@@ -1,8 +1,9 @@
-use data_generator::{DataGenerator, uniform::UniformStrategy, zipfian::ZipfianStrategy};
+use crate::{
+    error::{AppError, AppResult},
+    generator::{DataGenerator, uniform::UniformStrategy, zipfian::ZipfianStrategy},
+};
 use error_stack::{IntoReportCompat, ResultExt};
 use tracing::info;
-
-use crate::error::{AppError, AppResult};
 
 /// A constant seed value for reproducibility.
 const SEED: u64 = 42;
