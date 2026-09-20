@@ -1,5 +1,8 @@
-use crate::DistributionStrategy;
-use anyhow::Result;
+use crate::{
+    error::{AppError, AppResult},
+    generator::strategy::DistributionStrategy,
+};
+use error_stack::ResultExt;
 use rand::{RngExt, rngs::StdRng};
 use rand_distr::Uniform;
 
@@ -10,9 +13,11 @@ pub struct UniformStrategy {
 }
 
 impl UniformStrategy {
-    pub fn new(n: u64) -> Result<Self> {
+    pub fn new(n: u64) -> AppResult<Self> {
         Ok(Self {
-            uniform: Uniform::new_inclusive(1, n)?,
+            uniform: Uniform::new_inclusive(1, n).change_context(
+                AppError::SeedDistributionError("failed to create uniform strategy".to_string()),
+            )?,
         })
     }
 }

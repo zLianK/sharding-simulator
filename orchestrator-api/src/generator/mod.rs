@@ -1,4 +1,4 @@
-use crate::strategy::DistributionStrategy;
+use crate::generator::strategy::DistributionStrategy;
 use fake::{Fake, faker::lorem::en::Sentence};
 use rand::{SeedableRng, rngs::StdRng};
 use serde::{Deserialize, Serialize};
@@ -42,8 +42,8 @@ impl<T: DistributionStrategy> DataGenerator<T> {
 #[cfg(test)]
 pub mod test {
     use super::*;
-    use crate::uniform::UniformStrategy;
-    use crate::zipfian::ZipfianStrategy;
+    use crate::generator::uniform::UniformStrategy;
+    use crate::generator::zipfian::ZipfianStrategy;
 
     #[test]
     fn generate_zipfian_test() {

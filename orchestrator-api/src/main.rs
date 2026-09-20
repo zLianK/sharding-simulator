@@ -1,30 +1,29 @@
 use crate::{
-    log::log_install,
-    service::seed::{uniform_seed, zipfian_seed},
+    log::log_install, routes::app_routes, service::seed_service::SeedService, state::AppState,
 };
-use axum::{
-    Router,
-    routing::{get, post},
-};
+use std::sync::Arc;
 use tokio::net::TcpListener;
 use tracing::info;
 
+mod controller;
+mod error;
+mod generator;
 mod log;
 mod model;
+mod routes;
 mod service;
+mod state;
 
 #[tokio::main]
 async fn main() {
     log_install();
 
+    let seed_service = Arc::new(SeedService);
+
+    let state = AppState { seed_service };
+    let app = app_routes().with_state(state);
+
     let listener = get_listener().await;
-
-    let app = Router::new()
-        .route("/seed/uniform", post(uniform_seed))
-        .route("/seed/zipfian", post(zipfian_seed))
-        .route("/shard", get(shard))
-        .route("/reshard", get(reshard));
-
     axum::serve(listener, app).await.unwrap();
 }
 
@@ -34,14 +33,4 @@ async fn get_listener() -> TcpListener {
     let addr = listener.local_addr().unwrap();
     info!("listening on {addr}");
     listener
-}
-
-/// Starts the sharding process.
-async fn shard() -> String {
-    "The sharding process has started successfully.".to_string()
-}
-
-/// Starts the resharding process.
-async fn reshard() -> String {
-    "The resharding process has started successfully.".to_string()
 }
