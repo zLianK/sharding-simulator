@@ -1,5 +1,8 @@
 use data_generator::{DataGenerator, uniform::UniformStrategy, zipfian::ZipfianStrategy};
+use error_stack::{IntoReportCompat, ResultExt};
 use tracing::info;
+
+use crate::error::{AppError, AppResult};
 
 /// A constant seed value for reproducibility.
 const SEED: u64 = 42;
@@ -10,22 +13,30 @@ pub struct SeedService;
 
 impl SeedService {
     /// Handles the uniform seeding request.
-    pub fn uniform(&self, n: u64) {
-        let strategy = UniformStrategy::new(n).unwrap();
-        let mut generator = DataGenerator::new(strategy, SEED);
+    pub fn uniform(&self, n: u64) -> AppResult<()> {
+        let strategy = UniformStrategy::new(n).into_report().change_context(
+            AppError::SeedDistributionError("failed to create uniform strategy".to_string()),
+        )?;
 
+        let mut generator = DataGenerator::new(strategy, SEED);
         for _ in 0..n {
             info!("Generating uniform value {:?}", generator.generate());
         }
+
+        Ok(())
     }
 
     /// Handles the zipfian seeding request.
-    pub fn zipfian(&self, n: u64, s: f64) {
-        let strategy = ZipfianStrategy::new(n, s).unwrap();
-        let mut generator = DataGenerator::new(strategy, SEED);
+    pub fn zipfian(&self, n: u64, s: f64) -> AppResult<()> {
+        let strategy = ZipfianStrategy::new(n, s).into_report().change_context(
+            AppError::SeedDistributionError("failed to create zipfian strategy".to_string()),
+        )?;
 
+        let mut generator = DataGenerator::new(strategy, SEED);
         for _ in 0..n {
             info!("Generating zipfian value {:?}", generator.generate());
         }
+
+        Ok(())
     }
 }
